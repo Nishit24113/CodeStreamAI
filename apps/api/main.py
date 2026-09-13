@@ -118,8 +118,19 @@ async def cursor_move(sid, data):
         )
 
 
+# Database initialization
+from app.database import init_db
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup"""
+    await init_db()
+    print("✅ Database initialized")
+
+
 # Mount routes
-from app.routes import review
+from app.routes import review, auth
+app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(review.router, prefix="/api/review", tags=["review"])
 
 
