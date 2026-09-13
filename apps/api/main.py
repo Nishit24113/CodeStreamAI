@@ -129,9 +129,10 @@ async def startup_event():
 
 
 # Mount routes
-from app.routes import review, auth
+from app.routes import review, auth, search
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(review.router, prefix="/api/review", tags=["review"])
+app.include_router(search.router, prefix="/api/search", tags=["search"])
 
 
 if __name__ == "__main__":

@@ -10,14 +10,20 @@ from typing import Optional
 import asyncio
 
 from app.services.bedrock_service import bedrock_service
+from app.services.rag_service import RAGService
 
 router = APIRouter()
+
+# Initialize RAG service
+rag_service = RAGService()
 
 
 class CodeAnalysisRequest(BaseModel):
     code: str
     language: str = "javascript"
     analysis_type: str = "comprehensive"  # bugs, security, performance, comprehensive
+    use_rag: bool = True  # Enable RAG by default
+    top_k_context: int = 3  # Number of similar code examples for context
 
 
 class CodeAnalysisResponse(BaseModel):
@@ -43,17 +49,28 @@ async def analyze_code_stream(request: CodeAnalysisRequest):
             # Send initial connection event
             yield f"data: {{'type': 'connected', 'message': 'Analysis started'}}\n\n"
 
-            # Stream AI tokens
-            async for token in bedrock_service.analyze_code_stream(
-                code=request.code,
-                language=request.language,
-                analysis_type=request.analysis_type
-            ):
-                # Format as SSE
-                yield f"data: {{'type': 'token', 'content': '{token.replace(chr(10), '\\n').replace(chr(39), chr(92) + chr(39))}'}}\n\n"
-
-                # Small delay to prevent overwhelming client
-                await asyncio.sleep(0.01)
+            # Stream AI tokens with RAG if enabled
+            if request.use_rag:
+                async for token in rag_service.analyze_with_rag_stream(
+                    code=request.code,
+                    language=request.language,
+                    analysis_type=request.analysis_type,
+                    use_rag=True,
+                    top_k_context=request.top_k_context
+                ):
+                    # Format as SSE
+                    yield f"data: {{'type': 'token', 'content': '{token.replace(chr(10), '\\n').replace(chr(39), chr(92) + chr(39))}'}}\n\n"
+                    await asyncio.sleep(0.01)
+            else:
+                # Standard streaming without RAG
+                async for token in bedrock_service.analyze_code_stream(
+                    code=request.code,
+                    language=request.language,
+                    analysis_type=request.analysis_type
+                ):
+                    # Format as SSE
+                    yield f"data: {{'type': 'token', 'content': '{token.replace(chr(10), '\\n').replace(chr(39), chr(92) + chr(39))}'}}\n\n"
+                    await asyncio.sleep(0.01)
 
             # Send completion event
             yield f"data: {{'type': 'done', 'message': 'Analysis complete'}}\n\n"

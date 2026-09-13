@@ -135,10 +135,13 @@ function DashboardContent() {
               <p className="text-white font-medium">Open Editor</p>
             </Link>
 
-            <button className="p-4 bg-purple-600 hover:bg-purple-700 rounded-lg transition text-center">
+            <Link
+              href="/search"
+              className="p-4 bg-purple-600 hover:bg-purple-700 rounded-lg transition text-center"
+            >
               <div className="text-2xl mb-2">🔍</div>
               <p className="text-white font-medium">Search Code</p>
-            </button>
+            </Link>
 
             <button className="p-4 bg-green-600 hover:bg-green-700 rounded-lg transition text-center">
               <div className="text-2xl mb-2">📊</div>
