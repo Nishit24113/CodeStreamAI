@@ -1,0 +1,38 @@
+{
+  "name": "@codestream/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "next": "15.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "@monaco-editor/react": "^4.6.0",
+    "@tanstack/react-query": "^5.62.8",
+    "@trpc/client": "^11.0.0",
+    "@trpc/server": "^11.0.0",
+    "@trpc/react-query": "^11.0.0",
+    "socket.io-client": "^4.8.1",
+    "zustand": "^5.0.2",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.0",
+    "lucide-react": "^0.468.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5.7.2",
+    "tailwindcss": "^4.0.0",
+    "postcss": "^8",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.6"
+  }
+}
