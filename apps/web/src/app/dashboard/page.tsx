@@ -143,14 +143,17 @@ function DashboardContent() {
               <p className="text-white font-medium">Search Code</p>
             </Link>
 
-            <button className="p-4 bg-green-600 hover:bg-green-700 rounded-lg transition text-center">
-              <div className="text-2xl mb-2">📊</div>
-              <p className="text-white font-medium">View Reports</p>
-            </button>
+            <Link
+              href="/workers"
+              className="p-4 bg-green-600 hover:bg-green-700 rounded-lg transition text-center"
+            >
+              <div className="text-2xl mb-2">⚙️</div>
+              <p className="text-white font-medium">Workers</p>
+            </Link>
 
             <button className="p-4 bg-orange-600 hover:bg-orange-700 rounded-lg transition text-center">
-              <div className="text-2xl mb-2">⚙️</div>
-              <p className="text-white font-medium">Settings</p>
+              <div className="text-2xl mb-2">📊</div>
+              <p className="text-white font-medium">Analytics</p>
             </button>
           </div>
         </div>

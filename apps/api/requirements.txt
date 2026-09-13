@@ -40,3 +40,9 @@ pinecone-client==5.0.1
 sentence-transformers==3.1.1
 torch==2.5.1
 transformers==4.46.0
+
+# Celery + Workers
+celery[redis]==5.4.0
+celery[amqp]==5.4.0
+flower==2.0.1
+kombu==5.4.2
