@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { io, Socket } from 'socket.io-client'
-import { Code2, Users, Wifi, WifiOff, Play, Save } from 'lucide-react'
+import { Code2, Users, Wifi, WifiOff, Play, Save, Sparkles } from 'lucide-react'
+import { AIAnalysisPanel } from '@/components/AIAnalysisPanel'
 
 // Monaco Editor - dynamic import to avoid SSR issues
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
@@ -20,6 +21,7 @@ export default function EditorPage() {
   const [connected, setConnected] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [roomId] = useState(() => 'demo-room-' + Math.random().toString(36).substr(2, 9))
+  const [showAIPanel, setShowAIPanel] = useState(false)
   const editorRef = useRef<any>(null)
   const isRemoteChange = useRef(false)
 
@@ -161,6 +163,14 @@ export default function EditorPage() {
               <span>Run Code</span>
             </button>
 
+            <button
+              onClick={() => setShowAIPanel(!showAIPanel)}
+              className={`px-4 py-2 ${showAIPanel ? 'bg-purple-600' : 'bg-purple-600/20'} hover:bg-purple-700 text-white rounded-lg flex items-center space-x-2 transition-colors`}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>AI Review</span>
+            </button>
+
             <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center space-x-2 transition-colors">
               <Save className="h-4 w-4" />
               <span>Save</span>
@@ -242,6 +252,15 @@ export default function EditorPage() {
           </div>
         </div>
       </footer>
+
+      {/* AI Analysis Panel */}
+      {showAIPanel && (
+        <AIAnalysisPanel
+          code={code}
+          language="javascript"
+          onClose={() => setShowAIPanel(false)}
+        />
+      )}
     </div>
   )
 }

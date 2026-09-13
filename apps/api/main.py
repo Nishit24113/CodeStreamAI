@@ -118,11 +118,9 @@ async def cursor_move(sid, data):
         )
 
 
-# Mount routes (will be added in separate files)
-# from app.routes import review, search, user
-# app.include_router(review.router, prefix="/api/review", tags=["review"])
-# app.include_router(search.router, prefix="/api/search", tags=["search"])
-# app.include_router(user.router, prefix="/api/user", tags=["user"])
+# Mount routes
+from app.routes import review
+app.include_router(review.router, prefix="/api/review", tags=["review"])
 
 
 if __name__ == "__main__":
