@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  output: 'export', // Enable static export for S3/CloudFront
+  images: {
+    unoptimized: true, // Required for static export
+  },
   transpilePackages: ['@codestream/ui', '@codestream/types'],
   experimental: {
     turbo: {

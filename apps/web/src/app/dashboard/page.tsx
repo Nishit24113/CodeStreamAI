@@ -4,6 +4,8 @@ import { useAuth } from '@/context/AuthContext'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { AnalyticsModal } from '@/components/AnalyticsModal'
+import { useState } from 'react'
 
 export default function DashboardPage() {
   return (
@@ -16,6 +18,7 @@ export default function DashboardPage() {
 function DashboardContent() {
   const { user, logout } = useAuth()
   const router = useRouter()
+  const [showAnalytics, setShowAnalytics] = useState(false)
 
   const handleLogout = async () => {
     await logout()
@@ -151,7 +154,10 @@ function DashboardContent() {
               <p className="text-white font-medium">Workers</p>
             </Link>
 
-            <button className="p-4 bg-orange-600 hover:bg-orange-700 rounded-lg transition text-center">
+            <button
+              onClick={() => setShowAnalytics(true)}
+              className="p-4 bg-orange-600 hover:bg-orange-700 rounded-lg transition text-center"
+            >
               <div className="text-2xl mb-2">📊</div>
               <p className="text-white font-medium">Analytics</p>
             </button>
@@ -174,6 +180,14 @@ function DashboardContent() {
           </div>
         </div>
       </main>
+
+      {/* Analytics Modal */}
+      {showAnalytics && (
+        <AnalyticsModal
+          onClose={() => setShowAnalytics(false)}
+          username={user?.username || 'User'}
+        />
+      )}
     </div>
   )
 }

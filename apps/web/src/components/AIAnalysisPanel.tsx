@@ -19,7 +19,8 @@ export function AIAnalysisPanel({ code, language, onClose }: AIAnalysisPanelProp
     setIsStreaming(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/review/analyze/stream', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/review/analyze/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

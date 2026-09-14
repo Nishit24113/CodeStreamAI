@@ -41,7 +41,8 @@ function SearchContent() {
 
     try {
       const token = localStorage.getItem('access_token')
-      const response = await fetch('http://localhost:8000/api/search/search', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/search/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

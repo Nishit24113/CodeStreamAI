@@ -43,7 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/me', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -64,7 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('http://localhost:8000/api/auth/login', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -81,8 +83,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
 
-    await checkAuth()
-    router.push('/dashboard')
+    // Get user data before redirecting
+    try {
+      const userResponse = await fetch(`${apiUrl}/api/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${data.access_token}`
+        }
+      })
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        setUser(userData)
+        setLoading(false)
+        // Small delay to ensure state is set
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 100)
+      } else {
+        throw new Error('Failed to get user data')
+      }
+    } catch (error) {
+      console.error('Failed to get user:', error)
+      throw error
+    }
   }
 
   const register = async (
@@ -91,7 +114,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     fullName?: string
   ) => {
-    const response = await fetch('http://localhost:8000/api/auth/register', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -109,8 +133,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(error.detail || 'Registration failed')
     }
 
-    // Auto-login after registration
-    await login(email, password)
+    const data = await response.json()
+    localStorage.setItem('access_token', data.access_token)
+    localStorage.setItem('refresh_token', data.refresh_token)
+
+    // Get user data before redirecting
+    try {
+      const userResponse = await fetch(`${apiUrl}/api/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${data.access_token}`
+        }
+      })
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        setUser(userData)
+        setLoading(false)
+        // Small delay to ensure state is set
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 100)
+      } else {
+        throw new Error('Failed to get user data after registration')
+      }
+    } catch (error) {
+      console.error('Failed to get user after registration:', error)
+      throw error
+    }
   }
 
   const logout = async () => {
@@ -118,7 +167,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (token) {
       try {
-        await fetch('http://localhost:8000/api/auth/logout', {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        await fetch(`${apiUrl}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -142,7 +192,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error('No refresh token')
     }
 
-    const response = await fetch('http://localhost:8000/api/auth/refresh', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/api/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

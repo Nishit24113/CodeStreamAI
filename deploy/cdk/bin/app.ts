@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CodeStreamStack } from '../lib/codestream-stack';
+import { CompleteCodeStreamStack } from '../lib/complete-stack';
 
 const app = new cdk.App();
 
-new CodeStreamStack(app, 'CodeStreamAIStack', {
+new CompleteCodeStreamStack(app, 'CodeStreamAIStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
+    region: process.env.CDK_DEFAULT_REGION || 'us-west-2',
   },
-  stackName: 'codestream-ai-production',
-  description: 'CodeStream AI - Distributed Real-Time Code Review Platform',
+  stackName: 'codestream-ai-complete',
+  description: 'CodeStream AI - Complete Multi-Tenant SaaS Platform',
   tags: {
     Project: 'CodeStream AI',
     Environment: 'Production',
     ManagedBy: 'AWS CDK',
+    Architecture: 'Serverless Multi-Tenant SaaS',
   },
 });

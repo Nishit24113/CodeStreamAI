@@ -12,8 +12,8 @@ export default function HomePage() {
             <span className="text-2xl font-bold text-white">CodeStream AI</span>
           </div>
           <Link
-            href="/dashboard"
-            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+            href="/register"
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
           >
             Get Started
           </Link>

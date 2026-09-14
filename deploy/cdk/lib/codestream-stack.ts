@@ -9,6 +9,7 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 export class CodeStreamStack extends cdk.Stack {
@@ -93,7 +94,7 @@ export class CodeStreamStack extends cdk.Stack {
     // CloudFront Distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
-        origin: new origins.S3Origin(frontendBucket),
+        origin: origins.S3BucketOrigin.withOriginAccessControl(frontendBucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
       defaultRootObject: 'index.html',
@@ -107,14 +108,21 @@ export class CodeStreamStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       memorySize: 1024,
       environment: {
-        DATABASE_URL: `postgresql://${database.secret?.secretValueFromJson('username')}:${database.secret?.secretValueFromJson('password')}@${database.dbInstanceEndpointAddress}:${database.dbInstanceEndpointPort}/codestream`,
-        REDIS_URL: `redis://${redis.attrRedisEndpointAddress}:${redis.attrRedisEndpointPort}`,
+        DB_HOST: database.dbInstanceEndpointAddress,
+        DB_PORT: database.dbInstanceEndpointPort,
+        DB_NAME: 'codestream',
+        DB_SECRET_ARN: database.secret?.secretArn || '',
+        REDIS_HOST: redis.attrRedisEndpointAddress,
+        REDIS_PORT: redis.attrRedisEndpointPort,
       },
       vpc,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
     });
+
+    // Grant Lambda permission to read database secret
+    database.secret?.grantRead(apiLambda);
 
     // Allow Lambda to access database
     dbSecurityGroup.addIngressRule(
@@ -171,10 +179,17 @@ export class CodeStreamStack extends cdk.Stack {
       ],
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'worker' }),
       environment: {
-        DATABASE_URL: `postgresql://${database.secret?.secretValueFromJson('username')}:${database.secret?.secretValueFromJson('password')}@${database.dbInstanceEndpointAddress}:${database.dbInstanceEndpointPort}/codestream`,
-        REDIS_URL: `redis://${redis.attrRedisEndpointAddress}:${redis.attrRedisEndpointPort}`,
+        DB_HOST: database.dbInstanceEndpointAddress,
+        DB_PORT: database.dbInstanceEndpointPort,
+        DB_NAME: 'codestream',
+        DB_SECRET_ARN: database.secret?.secretArn || '',
+        REDIS_HOST: redis.attrRedisEndpointAddress,
+        REDIS_PORT: redis.attrRedisEndpointPort,
       },
     });
+
+    // Grant workers permission to read database secret
+    database.secret?.grantRead(workerTask.taskRole);
 
     // Fargate Service for Workers
     new ecs.FargateService(this, 'WorkerService', {
